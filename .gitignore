@@ -1,0 +1,59 @@
+# Python-related
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+*.venv
+env/
+venv/
+.venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Flask-related
+instance/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# Static files
+static/*.png
+static/*.jpg
+static/*.jpeg
+static/*.gif
+static/*.svg
+static/*.ico
+
+# VSCode
+.vscode/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Virtual environment
+server/venv/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Debugging files
+*.pdb
+*.prof
+*.profraw
+
+# Environment variables
+.env
+.env.*
+
+# Logs and reports
+logs/
+*.log
+*.out
+*.err
