@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  .App {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .upload-section {
+    margin-bottom: 20px;
+  }
+  
+  .upload-section input {
+    margin: 10px 0;
+  }
+  
+  .upload-section button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .upload-section button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .results-section {
+    margin-top: 20px;
+  }
+  
+  .anomaly-frames {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .frame {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: white;
+  }
+  
+  .final-results {
+    margin: 20px 0;
+  }
+  
+  .graph-container {
+    margin: 20px auto;
+    max-width: 800px;
+  }
+  
+  .output-video {
+    margin-top: 20px;
+  }

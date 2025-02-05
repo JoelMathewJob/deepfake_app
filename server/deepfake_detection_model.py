@@ -40,10 +40,14 @@ def process_video(video_path, output_folder, frame_skip=100, confidence_threshol
                     frame_indices.append(frame_count)
 
                     if fake_score > real_score:
+                        frame_filename = f"frame_{frame_count}.jpg"
+                        frame_path = os.path.join(output_folder, frame_filename)
+                        cv2.imwrite(frame_path, frame)  # Save the frame
                         anomaly_frames.append({
                             "frame_index": frame_count,
                             "real_score": real_score,
-                            "fake_score": fake_score
+                            "fake_score": fake_score,
+                            "frame_url": f"/processed_frames/{frame_filename}"  # URL for frontend
                         })
 
         frame_count += 1
@@ -51,7 +55,6 @@ def process_video(video_path, output_folder, frame_skip=100, confidence_threshol
     cap.release()
 
     # Plot the scores (for the graph)
-    print(real_score)
     plot_scores(real_scores, fake_scores, frame_indices)
 
     # Calculate the final results
