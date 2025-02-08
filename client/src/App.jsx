@@ -67,7 +67,9 @@ const App = () => {
             {predictions.frames_with_anomalies.map((frame, index) => (
               <div key={index} className="frame">
                 <p>Frame {frame.frame_index}: Real: {frame.real_score.toFixed(2)}, Fake: {frame.fake_score.toFixed(2)}</p>
-                <img src={frame.frame_url} alt={`Frame ${frame.frame_index}`} width="200" />
+                {/* <img src={frame.frame_url} alt={`Frame ${frame.frame_index}`} width="200" /> */}
+                <img src={`http://127.0.0.1:5000${frame.frame_url}`} alt={`Frame ${frame.frame_index}`} width="200" onError={(e) => e.target.style.display='none'} />
+
               </div>
             ))}
           </div>

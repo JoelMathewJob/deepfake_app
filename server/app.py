@@ -25,13 +25,21 @@ processor = AutoImageProcessor.from_pretrained("prithivMLmods/Deep-Fake-Detector
 model = AutoModelForImageClassification.from_pretrained("prithivMLmods/Deep-Fake-Detector-Model")
 pipe = pipeline("image-classification", model=model, feature_extractor=processor)
 
-def process_video(video_path, output_folder, frame_skip=100, confidence_threshold=0.5):
+def process_video(video_path, output_folder, confidence_threshold=0.5):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         return {"error": "Could not open video"}
+
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    # Adaptive frame skipping strategy
+    if total_frames <= 1000:
+        frame_skip = max(1, total_frames // 100)  # Capture every 10th frame for small videos
+    else:
+        frame_skip = max(1, total_frames // 100)  # Capture exactly 100 frames for large videos
 
     frame_count = 0
     real_scores = []
@@ -52,43 +60,39 @@ def process_video(video_path, output_folder, frame_skip=100, confidence_threshol
                 real_score = next((x['score'] for x in result if x['label'] == 'Real'), 0)
                 fake_score = next((x['score'] for x in result if x['label'] == 'Fake'), 0)
 
-                if real_score >= confidence_threshold or fake_score >= confidence_threshold:
-                    real_scores.append(real_score)
-                    fake_scores.append(fake_score)
-                    frame_indices.append(frame_count)
+                real_scores.append(real_score)
+                fake_scores.append(fake_score)
+                frame_indices.append(frame_count)
 
-                    if fake_score > real_score:
-                        frame_filename = f"frame_{frame_count}.jpg"
-                        frame_path = os.path.join(output_folder, frame_filename)
+                if fake_score > real_score:
+                    frame_filename = f"frame_{frame_count}.jpg"
+                    frame_path = os.path.join(output_folder, frame_filename)
 
-                        # Add text to the frame
-                        cv2.putText(
-                            frame,
-                            f"Real: {real_score:.2f}, Fake: {fake_score:.2f}",
-                            (10, 30),  # Position
-                            cv2.FONT_HERSHEY_SIMPLEX,
-                            0.7,  # Font size
-                            (0, 0, 255) if fake_score > real_score else (0, 255, 0),  # Red for fake, green for real
-                            2  # Thickness
-                        )
+                    cv2.putText(
+                        frame,
+                        f"Real: {real_score:.2f}, Fake: {fake_score:.2f}",
+                        (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.7,
+                        (0, 0, 255) if fake_score > real_score else (0, 255, 0),
+                        2
+                    )
 
-                        cv2.imwrite(frame_path, frame)  # Save the frame
-                        anomaly_frames.append({
-                            "frame_index": frame_count,
-                            "real_score": real_score,
-                            "fake_score": fake_score,
-                            "frame_url": f"/processed_frames/{frame_filename}"  # URL for frontend
-                        })
+                    cv2.imwrite(frame_path, frame)
+                    anomaly_frames.append({
+                        "frame_index": frame_count,
+                        "real_score": real_score,
+                        "fake_score": fake_score,
+                        "frame_url": f"/processed_frames/{frame_filename}"
+                    })
 
         frame_count += 1
 
     cap.release()
 
-    # Create output video
     output_video_path = os.path.join(output_folder, "output_video.mp4")
     create_output_video(output_folder, output_video_path)
 
-    # Calculate the final results
     final_scores = calculate_final_scores(real_scores, fake_scores)
 
     return {
@@ -99,6 +103,7 @@ def process_video(video_path, output_folder, frame_skip=100, confidence_threshol
         "final_scores": final_scores,
         "output_video_url": f"/processed_frames/output_video.mp4"
     }
+
 
 def create_output_video(output_folder, output_video_path, frame_rate=30):
     frame_files = sorted([f for f in os.listdir(output_folder) if f.endswith('.jpg')], key=lambda x: int(x.split('_')[1].split('.')[0]))
